@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorting Visualizer</title>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .header .nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header button {
+            padding: 8px 16px;
+            background-color: #eee;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .header button:hover {
+            background-color: #ddd;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 80%;
+            max-width: 800px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .content h2 {
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .input-area {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .input-area input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+            flex-grow: 1;
+        }
+
+        .input-area button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .input-area button:hover {
+            background-color: #45a049;
+        }
+
+        .algorithm-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .algorithm-area select {
+            padding: 8px;
+            margin-bottom: 10px;
+            width: 200px;
+        }
+
+        .visualization {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 300px;
+            width: 100%;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+        }
+
+        .bar {
+            width: 30px;
+            background-color: #3498db;
+            margin: 0 2px;
+            transition: height 0.3s ease;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+
+        }
+
+        .bar.comparison {
+            background-color: orange;
+            transition: height 0.3s ease, background-color 0.3s ease;
+        }
+
+        .bar.sorted {
+            background-color: green;
+            transition: background-color 0.3s ease; /* For smooth animation */
+        }
+
+        .bar-moving {
+            transition: transform 0.3s ease;
+        }
+
+
+
+        .bar-value{
+            position: absolute;
+            bottom: 0;
+            font-size: 12px;
+            color: #f0ec03;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+
+        .info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .code {
+            width: 100%;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+        }
+
+
+        #codeDisplay span {
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        
+
+        .footer {
+            width: 100%;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .speed-control label {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .speed-control input[type="range"] {
+            width: 80%;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .footer button {
+            padding: 8px 16px;
+            background-color: #eee;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .footer button:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sorting Visualizer</h1>
+            <div class="nav">
+                <button id="generateNew">Generate New</button>
+                <button id="about">About</button>
+                <button id="analysis">Analysis</button>
+            </div>
+        </div>
+        <div class="content">
+            <h2>Algorithm Visualization</h2>
+            <div class="input-area">
+                <input type="text" id="numberInput" placeholder="Insert comma separated numbers...">
+                <button id="createArray">Create</button>
+            </div>
+            <div class="algorithm-area">
+                <select id="algorithmSelect">
+                    <option value="">Select Algorithm</option>
+                    <option value="bubble">Bubble Sort</option>
+                    <option value="selection">Selection Sort</option>
+                    <option value="insertion">Insertion Sort</option>
+                    <option value="merge">Merge Sort</option>
+                    <option value="quick">Quick Sort</option>
+                </select>
+                <div class="visualization" id="visualization"></div>
+                <div class="info">
+                    <span id="passes">No. of passes: 0</span>
+                    <span id="comparisons">No. of comparisons: 0</span>
+                </div>
+                <div class="code" id="codeDisplay"></div>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="speed-control">
+                <label for="speed">Speed:</label>
+                <input type="range" id="speed" min="1" max="10" value="5">
+            </div>
+            <div class="controls">
+                <button id="playButton">Play</button>
+                <button id="pauseButton">Pause</button>
+                <button id="stepButton">Step</button>
+                <button id="resetButton">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let numbers = [];
+        let initialNumbers = []; // New global variable
+        let sortingAlgorithm = '';
+        let isSorting = false;
+        let isPaused = false;
+        let speed = 5;
+        let passes = 0;
+        let comparisons = 0;
+
+
+        // DOM elements
+        const numberInput = document.getElementById('numberInput');
+        const createArrayButton = document.getElementById('createArray');
+        const algorithmSelect = document.getElementById('algorithmSelect');
+        const visualization = document.getElementById('visualization');
+        const passesDisplay = document.getElementById('passes');
+        const comparisonsDisplay = document.getElementById('comparisons');
+        const codeDisplay = document.getElementById('codeDisplay');
+        const speedControl = document.getElementById('speed');
+        const playButton = document.getElementById('playButton');
+        const pauseButton = document.getElementById('pauseButton');
+        const stepButton = document.getElementById('stepButton');
+        const resetButton = document.getElementById('resetButton');
+        const generateNewButton = document.getElementById('generateNew');
+        const aboutButton = document.getElementById('about');
+        const analysisButton = document.getElementById('analysis');
+
+        // Event listeners
+        createArrayButton.addEventListener('click', createArray);
+        algorithmSelect.addEventListener('change', selectAlgorithm);
+        speedControl.addEventListener('input', updateSpeed);
+        playButton.addEventListener('click', startSorting);
+        pauseButton.addEventListener('click', pauseSorting);
+        stepButton.addEventListener('click', stepSorting);
+        resetButton.addEventListener('click', resetSorting);
+        generateNewButton.addEventListener('click', generateNewArray);
+        aboutButton.addEventListener('click', showAbout);
+        analysisButton.addEventListener('click', showAnalysis);
+
+        // Functions
+        function createArray() {
+            const input = numberInput.value.split(',').map(num => parseInt(num.trim()));
+            if (input.some(isNaN)) {
+                alert('Please enter valid numbers separated by commas.');
+                return;
+            }
+            numbers = [...input];
+            initialNumbers = [...input];  // Store the initial array
+            resetSorting();
+            updateVisualization();
+        }
+
+        function generateNewArray() {
+            const size = Math.floor(Math.random() * 20) + 5; // Random size between 5 and 24
+            numbers = Array.from({length: size}, () => Math.floor(Math.random() * 100) + 1);
+            initialNumbers = [...numbers];  // Store the initial array
+            resetSorting();
+            updateVisualization();
+        }
+
+        function updateVisualization() {
+            visualization.innerHTML = '';
+            const maxHeight = 250;
+            const maxNumber = Math.max(...numbers);
+            numbers.forEach(num => {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = `${(num / maxNumber) * maxHeight}px`;
+                
+                const barValue = document.createElement('span');
+                barValue.className = 'bar-value';
+                barValue.textContent = num;
+                
+                bar.appendChild(barValue);
+                visualization.appendChild(bar);
+            });
+        }
+
+
+        function applyVisualizationStyles(currentIndex, comparisonIndex, sortedIndex, isMerging) {
+            const bars = visualization.children;
+
+            // Reset styles for all bars except the sorted ones
+            for (let i = 0; i < bars.length; i++) {
+                if (!bars[i].classList.contains('sorted')) { // Skip bars already marked as sorted
+                    bars[i].classList.remove('comparison', 'bar-moving', 'merge');
+                }
+            }   
+             
+            if (comparisonIndex !== undefined) {
+                bars[currentIndex].classList.add('comparison'); // Add orange color to the current element
+                bars[comparisonIndex].classList.add('comparison'); // Add orange color to the element being compared
+            }
+            
+            // Highlight the current moving bar
+            if (currentIndex !== undefined) {
+                if (isMerging) {
+                    bars[currentIndex].classList.add('merge'); 
+                }else{
+                    bars[currentIndex].classList.add('bar-moving');
+                } 
+            }
+
+            // Mark sorted bar
+            if (sortedIndex !== undefined) {
+                bars[sortedIndex].classList.add('sorted');
+            }
+
+
+        }
+
+
+
+
+        function selectAlgorithm() {
+            sortingAlgorithm = algorithmSelect.value;
+            resetSorting();
+            displayAlgorithmCode();
+        }
+
+        function updateSpeed() {
+            speed = speedControl.value;
+        }
+
+        function startSorting() {
+            if (!sortingAlgorithm) {
+                alert('Please select a sorting algorithm.');
+                return;
+            }
+            if (!isSorting) {
+                isSorting = true;
+                isPaused = false;
+                runSortingAlgorithm();
+            } else if (isPaused) {
+                isPaused = false;
+                runSortingAlgorithm();
+            }
+        }
+
+        function pauseSorting() {
+            isPaused = true;
+        }
+
+        function stepSorting() {
+            if (!sortingAlgorithm) {
+                alert('Please select a sorting algorithm.');
+                return;
+            }
+            if (!isSorting || isPaused) {
+                isSorting = true;
+                isPaused = false;
+                runSortingAlgorithm(true);
+            }
+        }
+
+        function resetSorting() {
+            isSorting = false;
+            isPaused = false;
+            passes = 0;
+            comparisons = 0;
+            numbers = [...initialNumbers];
+            updateVisualization();
+            updateInfo();
+        }
+
+        function updateInfo() {
+            passesDisplay.textContent = `No. of passes: ${passes}`;
+            comparisonsDisplay.textContent = `No. of comparisons: ${comparisons}`;
+        }
+
+        function showAbout() {
+    const aboutText = `
+Sorting Visualizer
+
+Purpose:
+This Sorting Visualizer is an interactive educational tool designed to help users understand and compare various sorting algorithms. It provides a visual representation of how different sorting algorithms work, allowing users to see the step-by-step process of organizing data.
+
+Features:
+1. Multiple Sorting Algorithms: Visualize Bubble Sort, Selection Sort, Insertion Sort, Merge Sort, and Quick Sort.
+2. Custom Input: Enter your own set of numbers or generate a random array.
+3. Interactive Controls: Play, pause, step through, and reset the sorting process.
+4. Speed Control: Adjust the speed of the visualization to suit your learning pace.
+5. Real-time Statistics: View the number of comparisons and passes for each sort.
+6. Code Display: See the actual code of the sorting algorithm with real-time highlighting of the current step.
+7. Algorithm Analysis: Access quick analysis of the selected algorithm's time complexity, space complexity, and characteristics.
+
+How to Use:
+1. Select an Algorithm: Choose a sorting algorithm from the dropdown menu.
+2. Create an Array: Either input your own numbers separated by commas or click "Generate New" for a random array.
+3. Start Sorting: Click "Play" to begin the visualization. Use "Pause" to stop at any point, and "Step" to move through the sort one step at a time.
+4. Adjust Speed: Use the speed slider to make the visualization faster or slower.
+5. Reset: Click "Reset" to return the array to its original unsorted state.
+6. Analyze: Click "Analysis" to view details about the selected algorithm's performance characteristics.
+
+Educational Value:
+This visualizer helps in understanding:
+- How different sorting algorithms work internally
+- The efficiency of various algorithms in terms of comparisons and passes
+- Concepts like time complexity and space complexity in a practical context
+- The importance of choosing the right algorithm for different scenarios
+
+We hope this tool enhances your understanding of sorting algorithms and makes learning computer science concepts more engaging and interactive!
+`;
+
+    alert(aboutText);
+}
+
+        function showAnalysis() {
+    const analyses = {
+        bubble: `Bubble Sort:
+   - Time Complexity: O(n^2)
+   - Space Complexity: O(1)
+   - Stable: Yes
+   - In-place: Yes
+   - Best for: Small datasets or nearly sorted arrays`,
+        
+        selection: `Selection Sort:
+   - Time Complexity: O(n^2)
+   - Space Complexity: O(1)
+   - Stable: No
+   - In-place: Yes
+   - Best for: Small datasets or when memory is limited`,
+        
+        insertion: `Insertion Sort:
+   - Time Complexity: O(n^2)
+   - Space Complexity: O(1)
+   - Stable: Yes
+   - In-place: Yes
+   - Best for: Small datasets or nearly sorted arrays`,
+        
+        merge: `Merge Sort:
+   - Time Complexity: O(n log n)
+   - Space Complexity: O(n)
+   - Stable: Yes
+   - In-place: No
+   - Best for: Large datasets where stability is important`,
+        
+        quick: `Quick Sort:
+   - Time Complexity: O(n log n) average, O(n^2) worst case
+   - Space Complexity: O(log n)
+   - Stable: No
+   - In-place: Yes (with optimizations)
+   - Best for: Large datasets and general-purpose sorting`
+    };
+
+    if (!sortingAlgorithm) {
+        alert('Please select a sorting algorithm first.');
+        return;
+    }
+
+    const analysis = analyses[sortingAlgorithm];
+    if (analysis) {
+        alert(analysis);
+    } else {
+        alert('Analysis not available for the selected algorithm.');
+    }
+}
+
+        async function runSortingAlgorithm(singleStep = false) {
+            let generator;
+            switch (sortingAlgorithm) {
+                case 'bubble':
+                    generator = bubbleSort();
+                    break;
+                case 'selection':
+                    generator = selectionSort();
+                    break;
+                case 'insertion':
+                    generator = insertionSort();
+                    break;
+                case 'merge':
+                    generator = mergeSort(0, numbers.length - 1);
+                    break;
+                case 'quick':
+                    generator = quickSort(0, numbers.length - 1);
+                    break;
+            }
+
+            for (const step of generator) {
+                if (isPaused) break;
+                updateVisualization();
+                applyVisualizationStyles(step.currentIndex, step.comparisonIndex, step.sortedIndex, step.isMerging);
+                highlightCodeLine(step.codeLine);
+                updateInfo();
+                await new Promise(resolve => setTimeout(resolve, 1000 / speed));
+                if (singleStep) break;
+            }
+
+            if (!isPaused && !singleStep) {
+                isSorting = false;
+                for (let i = 0; i < numbers.length; i++) {
+                    applyVisualizationStyles(undefined, undefined, i);  // Mark all bars as sorted
+                }
+                updateInfo();
+            }
+        }
+
+        function highlightCodeLine(lineNumber) {
+           // Remove highlight from all lines
+           document.querySelectorAll('#codeDisplay span').forEach(span => {span.style.backgroundColor = '';});
+        
+           // Highlight the current line
+           const currentLine = document.getElementById(`codeLine${lineNumber}`);
+           if (currentLine) {
+            currentLine.style.backgroundColor = 'yellow';
+           }
+        }
+
+        function* bubbleSort() {
+            let n = numbers.length;
+            yield { codeLine: 1 }; // function bubbleSort(arr) {
+            yield { codeLine: 2 }; //     const n = arr.length;
+            for (let i = 0; i < n - 1; i++) {
+                yield { codeLine: 3 }; //     for (let i = 0; i < n - 1; i++) {
+                passes++;
+                for (let j = 0; j < n - i - 1; j++) {
+                    yield { codeLine: 4, currentIndex: j, comparisonIndex: j + 1}; //         for (let j = 0; j < n - i - 1; j++) {
+                    comparisons++;
+                    yield { codeLine: 5, currentIndex: j, comparisonIndex: j + 1 }; //             if (arr[j] > arr[j + 1]) {
+                    if (numbers[j] > numbers[j + 1]) {
+                        yield { codeLine: 6 , currentIndex: j, comparisonIndex: j + 1 }; //                 [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+                        [numbers[j], numbers[j + 1]] = [numbers[j + 1], numbers[j]];
+                        yield {codeLine: 6, currentIndex: j + 1, comparisonIndex: j }; // Swapped bar
+                    }
+                }
+                // Mark the last element as sorted
+                yield {codeLine: 4, sortedIndex: n - i - 1}; 
+            }
+            // Mark the first element as sorted (it will be in its place after the last pass)
+            yield {codeLine: 3, sortedIndex: 0};
+        }
+
+        function* selectionSort() {
+            let n = numbers.length;
+            yield { codeLine: 1 }; // function selectionSort(arr) {
+            yield { codeLine: 2 }; //     const n = arr.length;
+            for (let i = 0; i < n - 1; i++) {
+                yield { codeLine: 3 }; //     for (let i = 0; i < n - 1; i++) {
+                passes++;
+                let minIdx = i;
+                yield { codeLine: 4, currentIndex: i }; //         let minIdx = i;
+                for (let j = i + 1; j < n; j++) {
+                    yield { codeLine: 5, currentIndex: j, comparisonIndex: minIdx }; //         for (let j = i + 1; j < n; j++) {
+                    comparisons++;
+                    yield { codeLine: 6, currentIndex: j, comparisonIndex: minIdx }; //             if (arr[j] < arr[minIdx]) {
+                    if (numbers[j] < numbers[minIdx]) {
+                        minIdx = j;
+                        yield { codeLine: 7, currentIndex: j, comparisonIndex: minIdx }; //                 minIdx = j;
+
+                    }
+                }
+                if (minIdx !== i) {
+                    yield { codeLine: 10, currentIndex: i, comparisonIndex: minIdx }; //         if (minIdx !== i) {
+                    yield { codeLine: 11, currentIndex: i, comparisonIndex: minIdx }; //             [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
+                    [numbers[i], numbers[minIdx]] = [numbers[minIdx], numbers[i]];
+                }
+                yield {codeLine: 3, sortedIndex: i}; // Mark current position as sorted
+            }
+            yield {codeLine: 3, sortedIndex: n - 1}; // Mark the last element as sorted
+        }
+
+
+        function* insertionSort() {
+            let n = numbers.length;
+            yield { codeLine: 1 };
+            yield { codeLine: 2 };
+            for (let i = 1; i < n; i++) {
+                yield { codeLine: 3 };
+                passes++;
+                let key = numbers[i];
+                yield { codeLine: 4, currentIndex: i }; //         let key = arr[i];
+                let j = i - 1;
+                yield { codeLine: 5, currentIndex: i, comparisonIndex: j }; //         let j = i - 1;
+                while (j >= 0 && numbers[j] > key) {
+                    yield { codeLine: 6, currentIndex: j + 1, comparisonIndex: j }; //         while (j >= 0 && arr[j] > key) {
+                    comparisons++;
+                    numbers[j + 1] = numbers[j];
+                    yield { codeLine: 7, currentIndex: j + 1, comparisonIndex: j }; //             arr[j + 1] = arr[j];
+                    j--;
+                    yield { codeLine: 8, currentIndex: j + 1 }; //             j--;
+                }
+                numbers[j + 1] = key;
+                yield {codeLine: 10, currentIndex: j + 1}; // Inserting key;
+                yield { sortedIndex: i };
+            }
+            yield { codeLine: 3, sortedIndex: n - 1 }; // Mark the entire array as sorted
+        }
+
+        function* mergeSort(left = 0, right = numbers.length - 1) {
+            yield { codeLine: 1 }; // function mergeSort(arr, left, right) {
+            if (left < right) {
+                yield { codeLine: 2 }; //     if (left < right) {
+                const mid = Math.floor((left + right) / 2);
+                yield { codeLine: 3, currentIndex: mid }; //         const mid = Math.floor((left + right) / 2);
+
+
+                yield { codeLine: 4 }; // 
+                yield* mergeSort(left, mid);
+                yield { codeLine: 5}; // 
+                yield* mergeSort(mid + 1, right);
+                yield { codeLine: 6 }; // 
+                yield* merge(left, mid, right);
+            }
+        }
+
+        function* merge(left, mid, right) {
+            yield { codeLine: 8 }; // function merge(arr, left, mid, right) {
+            const leftArr = numbers.slice(left, mid + 1);
+            const rightArr = numbers.slice(mid + 1, right + 1);
+            yield { codeLine: 9, currentIndex: left, comparisonIndex: right }; //     const leftArr = arr.slice(left, mid + 1);
+            yield { codeLine: 10, currentIndex: mid + 1, comparisonIndex: right }; //     const rightArr = arr.slice(mid + 1, right + 1);
+
+            let i = 0, j = 0, k = left;
+            yield { codeLine: 11 }; //     let i = 0, j = 0, k = left;
+            while (i < leftArr.length && j < rightArr.length) {
+                yield { codeLine: 12, currentIndex: k, comparisonIndex: left + i }; //     while (i < leftArr.length && j < rightArr.length) {
+                comparisons++;
+                yield {currentIndex: k, comparisonIndex: (left + i), isMerging: true};
+                
+                if (leftArr[i] <= rightArr[j]) {
+                    yield { codeLine: 13, currentIndex: k, comparisonIndex: left + i }; //         if (leftArr[i] <= rightArr[j]) {
+                    numbers[k] = leftArr[i];
+                    yield { codeLine: 14, currentIndex: k, isMerging: true }; //             arr[k] = leftArr[i];
+                    i++;
+                    yield { codeLine: 15 }; //             i++;
+                } else {
+                    numbers[k] = rightArr[j];
+                    yield { codeLine: 17, currentIndex: k, isMerging: true }; //             arr[k] = rightArr[j];
+                    j++;
+                    yield { codeLine: 18 }; //             j++;
+                }
+                k++;
+                yield { codeLine: 20 }; //         k++;
+            }
+            while (i < leftArr.length) {
+                yield { codeLine: 22, currentIndex: k, comparisonIndex: left + i }; //     while (i < leftArr.length) {
+                numbers[k] = leftArr[i];
+                yield { codeLine: 23, currentIndex: k, isMerging: true }; //         arr[k] = leftArr[i];
+                i++;
+                k++;
+                yield { codeLine: 24 }; //         i++;
+                yield { codeLine: 25 }; //         K++;
+            }
+            while (j < rightArr.length) {
+                yield { codeLine: 27, currentIndex: k, comparisonIndex: mid + 1 + j }; //     while (j < rightArr.length) {
+                numbers[k] = rightArr[j];
+                yield { codeLine: 28, currentIndex: k, isMerging: true }; //         arr[k] = rightArr[j];
+                j++;
+                k++;
+                yield { codeLine: 29 }; //         j++;
+                yield { codeLine: 30 }; //         k++;
+            }
+            passes++;
+            for (let i = left; i <= right; i++) {
+                yield { sortedIndex: i };
+            }
+                
+        }
+
+        function* quickSort(low = 0, high = numebrs.length -1) {
+            yield { codeLine: 1 }; // function quickSort(arr, low, high) {
+            if (low < high) {
+                yield { codeLine: 2 }; //     if (low < high) {
+                const pi = yield* partition(low, high);
+                yield { codeLine: 3, currentIndex: pi }; //         const pi = partition(arr, low, high);
+                yield { codeLine: 4 }; //         quickSort(arr, low, pi - 1);
+
+
+                yield* quickSort(low, pi - 1);
+                yield { codeLine: 5 }; //         quickSort(arr, pi + 1, high);
+
+                yield* quickSort(pi + 1, high);
+            }
+        }
+
+        function* partition(low, high) {
+            yield { codeLine: 8 }; // function partition(arr, low, high) {
+            const pivot = numbers[high];
+            yield { codeLine: 9, currentIndex: high }; //     const pivot = arr[high];
+            let i = low - 1;
+            yield { codeLine: 10, currentIndex: low }; //     let i = low - 1;
+            for (let j = low; j < high; j++) {
+                yield { codeLine: 11, currentIndex: j, comparisonIndex: high }; //     for (let j = low; j < high; j++) {
+                comparisons++;
+                if (numbers[j] < pivot) {
+                    yield { codeLine: 12, currentIndex: j, comparisonIndex: high }; //         if (arr[j] < pivot) {
+                    i++;
+                    yield { codeLine: 13, currentIndex: i }; //             i++;
+                    [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
+                    yield { codeLine: 14, currentIndex: i, comparisonIndex: j }; //             [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+            }
+            [numbers[i + 1], numbers[high]] = [numbers[high], numbers[i + 1]];
+            yield { codeLine: 17, currentIndex: i + 1, comparisonIndex: high }; //     [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+            passes++;
+            yield { sortedIndex: i + 1 };
+            yield { codeLine: 18, currentIndex: i + 1 }; //     return i + 1;
+            return i + 1;
+        }
+
+        function displayAlgorithmCode() {
+            const codes = {
+                bubble: `function bubbleSort(arr) {
+    const n = arr.length;
+    for (let i = 0; i < n - 1; i++) {
+        for (let j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+            }
+        }
+    }
+}`,
+                selection: `function selectionSort(arr) {
+    const n = arr.length;
+    for (let i = 0; i < n - 1; i++) {
+        let minIdx = i;
+        for (let j = i + 1; j < n; j++) {
+            if (arr[j] < arr[minIdx]) {
+                minIdx = j;
+            }
+        }
+        if (minIdx !== i) {
+            [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
+        }
+    }
+}`,
+                insertion: `function insertionSort(arr) {
+    const n = arr.length;
+    for (let i = 1; i < n; i++) {
+        let key = arr[i];
+        let j = i - 1;
+        while (j >= 0 && arr[j] > key) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        arr[j + 1] = key;
+    }
+}`,
+                merge: `function mergeSort(arr, left, right) {
+    if (left < right) {
+        const mid = Math.floor((left + right) / 2);
+        mergeSort(arr, left, mid);
+        mergeSort(arr, mid + 1, right);
+        merge(arr, left, mid, right);
+    }
+}
+
+function merge(arr, left, mid, right) {
+    const leftArr = arr.slice(left, mid + 1);
+    const rightArr = arr.slice(mid + 1, right + 1);
+    let i = 0, j = 0, k = left;
+    while (i < leftArr.length && j < rightArr.length) {
+        if (leftArr[i] <= rightArr[j]) {
+            arr[k] = leftArr[i];
+            i++;
+        } else {
+            arr[k] = rightArr[j];
+            j++;
+        }
+        k++;
+    }
+    while (i < leftArr.length) {
+        arr[k] = leftArr[i];
+        i++;
+        k++;
+    }
+    while (j < rightArr.length) {
+        arr[k] = rightArr[j];
+        j++;
+        k++;
+    }
+}`,
+                quick: `function quickSort(arr, low, high) {
+    if (low < high) {
+        const pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+function partition(arr, low, high) {
+    const pivot = arr[high];
+    let i = low - 1;
+    for (let j = low; j < high; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+    }
+    [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+    return i + 1;
+}`
+            };
+            const code = codes[sortingAlgorithm] || 'Select an algorithm to view its code.';
+            const lines = code.split('\n');
+            const wrappedCode = lines.map((line, index) => `<span id="codeLine${index}">${line}</span>` ).join('\n');
+            
+            codeDisplay.innerHTML = wrappedCode;
+        }
+
+        // Initialize the visualizer
+        generateNewArray();
+    </script>
+</body>
+</html>
+
+
+
